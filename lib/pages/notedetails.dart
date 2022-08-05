@@ -152,7 +152,8 @@ class NoteDetailsState extends State<NoteDetails> {
                       // _showAlertDialog('Status', 'No Note was deleted!');
                       setState(() {
                         moveToLastScreen();
-                        _showAlertDialog('Status', 'Note Saved Successfully!');
+                        _showAlertDialog('Status',
+                            'Note Saved Successfully!\nState: $_cState\nTitle: ${titleController.text}\nDescription: ${descriptionController.text}');
                         debugPrint("Save button is clicked!");
                       });
                     },
@@ -168,8 +169,8 @@ class NoteDetailsState extends State<NoteDetails> {
                     onPressed: () {
                       setState(() {
                         moveToLastScreen();
-                        _showAlertDialog(
-                            'Status', 'Note Deleted Successfully!');
+                        _showAlertDialog('Status',
+                            'Note Deleted Successfully!\nState: $_cState\nTitle: ${titleController.text}\nDescription: ${descriptionController.text}');
                         debugPrint("Delete button is clicked!");
                       });
                     },
