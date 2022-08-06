@@ -245,10 +245,6 @@ class _HomePageState extends State<HomePage> {
                                   } else {
                                     _cPP = 1;
                                   }
-                                  debugPrint(noteData.priority.toString());
-                                  debugPrint(noteData.id.toString());
-                                  debugPrint(noteData.title.toString());
-                                  debugPrint(_cPP.toString());
                                   database.updateNote(NoteData(
                                     id: noteData.id,
                                     title: noteData.title,
