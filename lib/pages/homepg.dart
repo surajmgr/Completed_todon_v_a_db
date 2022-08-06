@@ -165,6 +165,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget noteListUI(List<NoteData> noteList) {
+    noteList.sort((a, b) {
+      //sorting in descending order
+      return DateTime.parse(b.date.toString().substring(0, 16))
+          .compareTo(DateTime.parse(a.date.toString().substring(0, 16)));
+    });
+    noteList.sort((a, b) => a.priority!.compareTo(b.priority!));
     return ListView.builder(
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
@@ -230,7 +236,7 @@ class _HomePageState extends State<HomePage> {
                                     id: noteData.id,
                                     title: noteData.title,
                                     description: noteData.description,
-                                    date: DateTime.now(),
+                                    date: noteData.date,
                                     // color: Value(1),
                                     priority: _cPP,
                                   ));
