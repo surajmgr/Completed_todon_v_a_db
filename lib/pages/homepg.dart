@@ -70,9 +70,20 @@ class _HomePageState extends State<HomePage> {
             if (noteList != null) {
               if (noteList.isEmpty) {
                 debugPrint("Note List is Empty!");
-                return Center(
-                  child: getNotesListView(),
-                );
+                for (var i = 0; i < 1; i++) {
+                  database
+                      .insertNote(NoteCompanion(
+                    title: dr.Value("Title..."),
+                    description: dr.Value("Description..."),
+                    date: dr.Value(DateTime.now()),
+                    // color: Value(1),
+                    priority: dr.Value(1),
+                  ))
+                      .then((value) {
+                    setState(() {});
+                  });
+                }
+                return Container();
               } else {
                 debugPrint("Something's in the Note List!");
                 return Container(
@@ -80,9 +91,31 @@ class _HomePageState extends State<HomePage> {
                   child: SingleChildScrollView(
                     physics: ScrollPhysics(),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        HeadingHP(noteList: noteList),
+                        // Heading
+                        HeadingHP(
+                          noteList: noteList,
+                          name: 'Suraj',
+                        ),
+                        // List Builder
                         noteListUI(noteList),
+                        // End
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "End of the List!",
+                              style: TextStyle(
+                                // decoration: TextDecoration.underline,
+                                // color: Colors.amberAccent,
+                                fontFamily: 'EDU VIC',
+                                fontSize: 20,
+                                fontWeight: FontWeight.w300,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -122,58 +155,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  ListView getNotesListView() {
-    // TextStyle titleStyle = Theme.of(context).textTheme.subhead;
-
-    return ListView.builder(
-      itemCount: 0,
-      itemBuilder: (BuildContext context, int index) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(40, 28, 40, 0),
-          child: Card(
-            elevation: 5,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(13),
-            ),
-            color: Colors.white12,
-            child: ListTile(
-              leading: Icon(Icons.check_circle_outline),
-              title: Text(
-                "this.noteList![index].title!",
-                style: TextStyle(
-                  // decoration: TextDecoration.underline,
-                  // color: Colors.amberAccent,
-                  fontFamily: 'EDU VIC',
-                  fontSize: 28,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              subtitle: Text(
-                "this.noteList![index].description!\n",
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontFamily: 'Edu VIC',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-              trailing: GestureDetector(
-                child: Icon(Icons.delete),
-                onTap: () {
-                  // _delete(context, noteList![index]);
-                },
-              ),
-              onTap: () {
-                debugPrint("List Tile is tapped!");
-                // navigateToDetails("Edit Note");
-              },
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   void _showSnackBar(BuildContext context, String message) {
     final snackBar = SnackBar(content: Text(message));
     Scaffold.of(context).showSnackBar(snackBar);
@@ -203,7 +184,7 @@ class _HomePageState extends State<HomePage> {
                 ));
           },
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(25, 10, 25, 0),
+            padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
             child: Card(
               elevation: 5,
               shape: RoundedRectangleBorder(
@@ -211,7 +192,7 @@ class _HomePageState extends State<HomePage> {
               ),
               color: Colors.white12,
               child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.fromLTRB(15, 12, 12, 7),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -421,20 +402,38 @@ class HeadingHP extends StatelessWidget {
   const HeadingHP({
     Key? key,
     required this.noteList,
+    required this.name,
   }) : super(key: key);
 
   final List<NoteData>? noteList;
+  final String? name;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(25.0, 5.0, 25.0, 8.0),
+      padding: const EdgeInsets.fromLTRB(25.0, 15.0, 25.0, 20.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          CircleAvatar(
+            backgroundColor: Colors.indigoAccent,
+            radius: 32,
+            child: CircleAvatar(
+              backgroundColor: Colors.black87,
+              radius: 30,
+              backgroundImage: AssetImage('assets/Akatsuki_sng_ur.png'),
+              // child: ClipRRect(
+              //   child: Image.asset('assets/Akatsuki_sng_ur.png'),
+              //   borderRadius: BorderRadius.circular(50.0),
+              // ),
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
           Text(
-            "Hello, Coders!",
+            "Hello, ${name ?? 'Coders'}!",
             style: TextStyle(
               color: Colors.white,
               fontFamily: 'Alex Brush',
@@ -444,7 +443,7 @@ class HeadingHP extends StatelessWidget {
             ),
           ),
           Text(
-            "This is your todo-list, Today, you have ${noteList?.length} tasks to complete.",
+            "This is your todo-list.\nYou still have ${noteList?.length} tasks in the list.",
             style: TextStyle(
               color: Colors.white70,
               fontFamily: 'Edu VIC',
