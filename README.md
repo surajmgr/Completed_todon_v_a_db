@@ -1,7 +1,6 @@
 # todon_v_a_db
 
-#### This is the simple UI interface of the TODO Note App
-#### Lacks: Homepage Items & Database System (CRUD)
+#### CRUD system completed for the todo-notes
 
 ***TODO Note; Version: a; Sub_version: Database;***
 
