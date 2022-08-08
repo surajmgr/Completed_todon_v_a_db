@@ -155,10 +155,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showSnackBar(BuildContext context, String message) {
-    final snackBar = SnackBar(content: Text(message));
-    Scaffold.of(context).showSnackBar(snackBar);
-  }
+  // void _showSnackBar(BuildContext context, String message) {
+  //   final snackBar = SnackBar(content: Text(message));
+  //   Scaffold.of(context).showSnackBar(snackBar);
+  // }
 
   Future<List<NoteData>> _getNoteFromDatabase() async {
     return await database.getNoteList;
