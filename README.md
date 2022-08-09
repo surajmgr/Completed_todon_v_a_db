@@ -11,3 +11,5 @@
 #### * try#db_fb_a => Drift Setup completed in the newer version in accordance with sound null safety and other concerning dependencies
 
 #### * try#db_fb_b => CRUD system completed for the todo-notes
+
+#### * try#db_hive_a => Upgrade the master branch UI to try#db_fb_b branch (Remove Drift[Moor] from the branch)
