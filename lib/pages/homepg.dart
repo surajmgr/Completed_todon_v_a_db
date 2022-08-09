@@ -1,10 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:drift/drift.dart' as dr;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:todon_v_a_db/database/drift_database.dart';
 import 'package:todon_v_a_db/pages/notedetails.dart';
 import 'package:todon_v_a_db/widgets/drawer.dart';
 
@@ -16,8 +13,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late AppDatabase database;
-
   var txt = "List of the Notes";
 
   //Hide Status
@@ -31,7 +26,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    database = Provider.of<AppDatabase>(context);
     return Scaffold(
       // extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -62,87 +56,42 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
-      body: FutureBuilder<List<NoteData>>(
-        future: _getNoteFromDatabase(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            List<NoteData>? noteList = snapshot.data;
-            if (noteList != null) {
-              if (noteList.isEmpty) {
-                debugPrint("Note List is Empty!");
-                for (var i = 0; i < 1; i++) {
-                  database
-                      .insertNote(NoteCompanion(
-                    title: dr.Value("Title..."),
-                    description: dr.Value("Description..."),
-                    date: dr.Value(DateTime.now()),
-                    // color: Value(1),
-                    priority: dr.Value(1),
-                  ))
-                      .then((value) {
-                    setState(() {});
-                  });
-                }
-                return Container();
-              } else {
-                debugPrint("Something's in the Note List!");
-                return Container(
-                  padding: EdgeInsets.only(top: 5, bottom: 20),
-                  child: SingleChildScrollView(
-                    physics: ScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Heading
-                        HeadingHP(
-                          noteList: noteList,
-                          name: 'Suraj',
-                        ),
-                        // List Builder
-                        noteListUI(noteList),
-                        // End
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              "End of the List!",
-                              style: TextStyle(
-                                // decoration: TextDecoration.underline,
-                                // color: Colors.amberAccent,
-                                fontFamily: 'EDU VIC',
-                                fontSize: 20,
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+      body: Container(
+        padding: EdgeInsets.only(top: 5, bottom: 20),
+        child: SingleChildScrollView(
+          physics: ScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Heading
+              HeadingHP(name: 'Suraj'),
+              // List Builder
+              noteListUI(),
+              // End
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "End of the List!",
+                    style: TextStyle(
+                      // decoration: TextDecoration.underline,
+                      // color: Colors.amberAccent,
+                      fontFamily: 'EDU VIC',
+                      fontSize: 20,
+                      fontWeight: FontWeight.w300,
                     ),
                   ),
-                );
-              }
-            }
-          } else if (snapshot.hasError) {
-            return Center(child: Text(snapshot.error.toString()));
-          }
-          return Center(
-            child: Container(),
-          );
-        },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       drawer: const MyDrawer(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color.fromARGB(190, 12, 12, 12),
         onPressed: (() {
-          navigateToDetails(
-              'Add Note',
-              NoteCompanion(
-                title: dr.Value(''),
-                description: dr.Value(''),
-                date: dr.Value(DateTime.now()),
-                priority: dr.Value(1),
-                color: dr.Value(7),
-              ));
+          navigateToDetails('Add Note');
         }),
         child: const Center(
           child: Icon(
@@ -155,39 +104,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // void _showSnackBar(BuildContext context, String message) {
-  //   final snackBar = SnackBar(content: Text(message));
-  //   Scaffold.of(context).showSnackBar(snackBar);
-  // }
-
-  Future<List<NoteData>> _getNoteFromDatabase() async {
-    return await database.getNoteList;
-  }
-
-  Widget noteListUI(List<NoteData> noteList) {
-    noteList.sort((a, b) {
-      //sorting in descending order
-      return DateTime.parse(b.date.toString().substring(0, 16))
-          .compareTo(DateTime.parse(a.date.toString().substring(0, 16)));
-    });
-    noteList.sort((a, b) => a.priority!.compareTo(b.priority!));
+  Widget noteListUI() {
     return ListView.builder(
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      itemCount: noteList.length,
+      itemCount: 0,
       itemBuilder: (BuildContext context, int index) {
-        NoteData noteData = noteList[index];
         return InkWell(
           onTap: () {
-            navigateToDetails(
-                'Edit Note',
-                NoteCompanion(
-                  id: dr.Value(noteData.id),
-                  title: dr.Value(noteData.title),
-                  description: dr.Value(noteData.description),
-                  priority: dr.Value(noteData.priority),
-                  date: dr.Value(noteData.date),
-                ));
+            navigateToDetails('Edit Note');
           },
           child: Padding(
             padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
@@ -207,7 +132,7 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          noteData.title,
+                          "noteData.title",
                           style: TextStyle(
                             // decoration: TextDecoration.underline,
                             // color: Colors.amberAccent,
@@ -225,31 +150,12 @@ class _HomePageState extends State<HomePage> {
                               constraints: BoxConstraints(),
                               // splashRadius: 15,
                               onPressed: () {
-                                setState(() {
-                                  int _cPP;
-                                  if (noteData.priority != 2) {
-                                    _cPP = 2;
-                                  } else {
-                                    _cPP = 1;
-                                  }
-                                  database.updateNote(NoteData(
-                                    id: noteData.id,
-                                    title: noteData.title,
-                                    description: noteData.description,
-                                    date: noteData.date,
-                                    // color: Value(1),
-                                    priority: _cPP,
-                                  ));
-                                  // database.updateNote(NoteData(
-                                  //     id: noteData.id,
-                                  //     title: noteData.title,
-                                  //     priority: 2));
-                                });
+                                setState(() {});
                                 debugPrint("List Tile is Checked!");
                               },
                               icon: Icon(
                                 Icons.check_circle_outline,
-                                color: getStateColor(noteData.priority!),
+                                color: getStateColor(1),
                               ),
                             ),
                             IconButton(
@@ -257,7 +163,7 @@ class _HomePageState extends State<HomePage> {
                               constraints: BoxConstraints(),
                               // splashRadius: 15,
                               onPressed: () {
-                                deleteNote(context, noteData);
+                                deleteNote(context);
                               },
                               icon: Icon(
                                 Icons.delete_outlined,
@@ -274,7 +180,7 @@ class _HomePageState extends State<HomePage> {
                         bottom: 5,
                       ),
                       child: Text(
-                        "${noteData.description}",
+                        "{noteData.description}",
                         style: TextStyle(
                           color: Colors.white70,
                           fontFamily: 'Edu VIC',
@@ -286,57 +192,13 @@ class _HomePageState extends State<HomePage> {
                     //Date
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
+                      children: const [
                         Text(
-                          noteData.date.toString().substring(0, 16),
+                          "2022-08-28",
                           style: TextStyle(color: Colors.white70),
                         ),
                       ],
                     )
-                    // ListTile(
-                    //   leading: GestureDetector(
-                    //     child: Icon(
-                    //       Icons.check_circle_outline,
-                    //       color: getStateColor(noteData.priority!),
-                    //     ),
-                    //     onTap: () {
-                    //       setState(() {
-                    //         //Update Color
-                    //       });
-                    //       debugPrint("List Tile is Checked!");
-                    //     },
-                    //   ),
-                    //   title: Text(
-                    //     noteData.title,
-                    //     style: TextStyle(
-                    //       // decoration: TextDecoration.underline,
-                    //       // color: Colors.amberAccent,
-                    //       fontFamily: 'EDU VIC',
-                    //       fontSize: 28,
-                    //       fontWeight: FontWeight.w400,
-                    //     ),
-                    //   ),
-                    //   subtitle: Text(
-                    //     "${noteData.description}\n",
-                    //     style: TextStyle(
-                    //       color: Colors.white70,
-                    //       fontFamily: 'Edu VIC',
-                    //       fontSize: 20,
-                    //       fontWeight: FontWeight.w300,
-                    //     ),
-                    //   ),
-                    //   trailing: GestureDetector(
-                    //     child: Icon(Icons.delete),
-                    //     onTap: () {
-                    //       // _delete(context, noteList![index]);
-                    //       debugPrint("List Tile is Deleted!");
-                    //     },
-                    //   ),
-                    //   onTap: () {
-                    //     debugPrint("List Tile is tapped!");
-                    //     // navigateToDetails("Edit Note");
-                    //   },
-                    // ),
                   ],
                 ),
               ),
@@ -347,7 +209,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<dynamic> deleteNote(BuildContext context, NoteData noteData) {
+  Future<dynamic> deleteNote(BuildContext context) {
     return showDialog(
         context: context,
         builder: (context) {
@@ -365,9 +227,7 @@ class _HomePageState extends State<HomePage> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  setState(() {
-                    database.deleteNote(noteData);
-                  });
+                  setState(() {});
                 },
                 child: Text("Yes!"),
               ),
@@ -376,13 +236,10 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
-  void navigateToDetails(String title, NoteCompanion noteCompanion) async {
+  void navigateToDetails(String title) async {
     bool res =
         await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return NoteDetails(
-        appBarTitle: title,
-        noteCompanion: noteCompanion,
-      );
+      return NoteDetails(appBarTitle: title);
     }));
     if (res == true) {
       debugPrint("Hey It's restated!");
@@ -407,11 +264,9 @@ class _HomePageState extends State<HomePage> {
 class HeadingHP extends StatelessWidget {
   const HeadingHP({
     Key? key,
-    required this.noteList,
     required this.name,
   }) : super(key: key);
 
-  final List<NoteData>? noteList;
   final String? name;
 
   @override
@@ -449,7 +304,7 @@ class HeadingHP extends StatelessWidget {
             ),
           ),
           Text(
-            "This is your todo-list.\nYou still have ${noteList?.length} tasks in the list.",
+            "This is your todo-list.\nYou still have 5 tasks in the list.",
             style: TextStyle(
               color: Colors.white70,
               fontFamily: 'Edu VIC',

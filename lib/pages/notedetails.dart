@@ -1,19 +1,12 @@
 // ignore_for_file: prefer_const_constructors
-
-import 'package:drift/drift.dart' as dr;
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:todon_v_a_db/database/drift_database.dart';
-import 'package:todon_v_a_db/pages/homepg.dart';
 
 class NoteDetails extends StatefulWidget {
   final String appBarTitle;
-  final NoteCompanion noteCompanion;
 
   NoteDetails({
     Key? key,
     required this.appBarTitle,
-    required this.noteCompanion,
   }) : super(key: key);
 
   @override
@@ -24,24 +17,19 @@ class NoteDetailsState extends State<NoteDetails> {
   static var _state = ['In-Progress', 'Completed'];
   int? _cP;
 
-  late AppDatabase appDatabase;
-  late TextEditingController titleController = TextEditingController();
-  late TextEditingController descriptionController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
 
   @override
   void initState() {
     titleController = TextEditingController();
     descriptionController = TextEditingController();
-    titleController.text = widget.noteCompanion.title.value;
-    descriptionController.text = widget.noteCompanion.description.value ?? '';
-    _cP = widget.noteCompanion.priority.value ?? 1;
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    appDatabase = Provider.of<AppDatabase>(context);
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -68,8 +56,7 @@ class NoteDetailsState extends State<NoteDetails> {
         actions: [
           IconButton(
             onPressed: () {
-              // iconPress("Save");
-              _saveToDB();
+              iconPress("Save");
               debugPrint("Saved!!!");
             },
             icon: const Icon(Icons.save_outlined),
@@ -78,14 +65,7 @@ class NoteDetailsState extends State<NoteDetails> {
             padding: const EdgeInsets.only(right: 10),
             child: IconButton(
               onPressed: () {
-                setState(() {
-                  deleteNote(
-                      context,
-                      NoteData(
-                          id: widget.noteCompanion.id.value,
-                          title: widget.noteCompanion.title.value));
-                });
-                // iconPress("Delete");
+                deleteNote(context);
               },
               icon: const Icon(Icons.delete_outlined),
             ),
@@ -93,11 +73,12 @@ class NoteDetailsState extends State<NoteDetails> {
         ],
       ),
 
-      // Dropdown State
+      // Details Page
       body: Padding(
         padding: EdgeInsets.fromLTRB(20, 15, 10, 20),
         child: ListView(
           children: [
+            // Dropdown State
             Padding(
               padding: const EdgeInsets.only(left: 10, right: 10),
               child: ListTile(
@@ -197,6 +178,7 @@ class NoteDetailsState extends State<NoteDetails> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Save
                   ElevatedButton(
                     child: Text(
                       "Save",
@@ -204,24 +186,20 @@ class NoteDetailsState extends State<NoteDetails> {
                     ),
                     onPressed: () {
                       // _showAlertDialog('Status', 'No Note was deleted!');
-                      // iconPress("Save");
-                      _saveToDB();
+                      iconPress("Save");
                     },
                   ),
                   SizedBox(
                     width: 10,
                   ),
+                  // Delete
                   ElevatedButton(
                     child: Text(
                       "Delete",
                       textScaleFactor: 1.5,
                     ),
                     onPressed: () {
-                      deleteNote(
-                          context,
-                          NoteData(
-                              id: widget.noteCompanion.id.value,
-                              title: widget.noteCompanion.title.value));
+                      deleteNote(context);
                     },
                   ),
                 ],
@@ -254,33 +232,6 @@ class NoteDetailsState extends State<NoteDetails> {
     });
   }
 
-  void _saveToDB() {
-    if (widget.noteCompanion.id.present) {
-      appDatabase
-          .updateNote(NoteData(
-            id: widget.noteCompanion.id.value,
-            title: titleController.text,
-            description: descriptionController.text,
-            date: DateTime.now(),
-            // color: Value(1),
-            priority: _cP,
-          ))
-          .then((value) => moveToLastScreen());
-    } else {
-      appDatabase
-          .insertNote(NoteCompanion(
-        title: dr.Value(titleController.text),
-        description: dr.Value(descriptionController.text),
-        date: dr.Value(DateTime.now()),
-        // color: Value(1),
-        priority: dr.Value(_cP),
-      ))
-          .then((value) {
-        moveToLastScreen();
-      });
-    }
-  }
-
   updateString() {
     if (_cP == 2) {
       return 'Completed';
@@ -289,7 +240,7 @@ class NoteDetailsState extends State<NoteDetails> {
     }
   }
 
-  Future<dynamic> deleteNote(BuildContext context, NoteData noteData) {
+  Future<dynamic> deleteNote(BuildContext context) {
     return showDialog(
         context: context,
         builder: (context) {
@@ -307,8 +258,7 @@ class NoteDetailsState extends State<NoteDetails> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  moveToLastScreen();
-                  appDatabase.deleteNote(noteData);
+                  iconPress("Delete");
                 },
                 child: Text("Yes!"),
               ),
