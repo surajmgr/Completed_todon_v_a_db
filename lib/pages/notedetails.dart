@@ -1,12 +1,18 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:todon_v_a_db/database/note.dart';
 
 class NoteDetails extends StatefulWidget {
   final String appBarTitle;
+  late Box<Note> noteBox;
+  late int? index;
 
   NoteDetails({
     Key? key,
     required this.appBarTitle,
+    required this.noteBox,
+    required this.index,
   }) : super(key: key);
 
   @override
@@ -15,10 +21,11 @@ class NoteDetails extends StatefulWidget {
 
 class NoteDetailsState extends State<NoteDetails> {
   static var _state = ['In-Progress', 'Completed'];
-  int? _cP;
+  bool _cP = false;
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  var noteData;
 
   @override
   void initState() {
@@ -26,6 +33,17 @@ class NoteDetailsState extends State<NoteDetails> {
     descriptionController = TextEditingController();
 
     super.initState();
+    if (widget.index != null) {
+      noteData = widget.noteBox.getAt(widget.index!);
+      titleController.text = noteData.title;
+      descriptionController.text = noteData.description ?? "";
+      _cP = noteData.isCompleted;
+      debugPrint("Notes: ${noteData!.key}");
+    } else {
+      noteData = null;
+      debugPrint("Notes: ${widget.noteBox.keys}");
+      _cP = false;
+    }
   }
 
   @override
@@ -92,13 +110,13 @@ class NoteDetailsState extends State<NoteDetails> {
                       child: Text(dropDownStringItem),
                     );
                   }).toList(),
-                  value: updateString(),
+                  value: updateString(_cP),
                   onChanged: (valueSelectedByUser) {
                     setState(() {
                       if (valueSelectedByUser == 'In-Progress') {
-                        _cP = 1;
+                        _cP = false;
                       } else {
-                        _cP = 2;
+                        _cP = true;
                       }
                       debugPrint("User selected $valueSelectedByUser");
                     });
@@ -187,6 +205,11 @@ class NoteDetailsState extends State<NoteDetails> {
                     onPressed: () {
                       // _showAlertDialog('Status', 'No Note was deleted!');
                       iconPress("Save");
+                      if (noteData == null) {
+                        _addInfo();
+                      } else {
+                        _updateInfo();
+                      }
                     },
                   ),
                   SizedBox(
@@ -232,8 +255,8 @@ class NoteDetailsState extends State<NoteDetails> {
     });
   }
 
-  updateString() {
-    if (_cP == 2) {
+  updateString(bool? _cPn) {
+    if (_cPn == true) {
       return 'Completed';
     } else {
       return 'In-Progress';
@@ -265,5 +288,33 @@ class NoteDetailsState extends State<NoteDetails> {
             ],
           );
         });
+  }
+
+  // Add the data
+  _addInfo() {
+    Note newNote = Note(
+      title: titleController.text,
+      description: descriptionController.text,
+      date: DateTime.now(),
+      isCompleted: _cP,
+    );
+    widget.noteBox.add(newNote);
+    debugPrint("Info Added: \n $newNote");
+    debugPrint("Key: ${newNote.key}");
+    moveToLastScreen();
+  }
+
+  // Update the data
+  _updateInfo() {
+    Note updateNote = Note(
+      title: titleController.text,
+      description: descriptionController.text,
+      date: DateTime.now(),
+      isCompleted: _cP,
+    );
+    widget.noteBox.putAt(widget.index!, updateNote);
+    debugPrint("Info Added: \n $updateNote");
+    debugPrint("Key: ${updateNote.key}");
+    moveToLastScreen();
   }
 }

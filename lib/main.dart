@@ -1,7 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:todon_v_a_db/database/note.dart';
 import 'package:todon_v_a_db/pages/homepg.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() => runApp(const MyApp());
+Future main() async {
+  // Initialize
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+
+  // Registing Adapter for the custom objects
+  Hive.registerAdapter(NoteAdapter());
+
+  // Open Box
+  await Hive.openBox<Note>('notes');
+
+  // Run the widgets
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);

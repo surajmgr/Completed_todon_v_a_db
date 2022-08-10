@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:todon_v_a_db/database/note.dart';
 import 'package:todon_v_a_db/pages/notedetails.dart';
 import 'package:todon_v_a_db/widgets/drawer.dart';
 
@@ -14,14 +16,27 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var txt = "List of the Notes";
+  int? red;
+
+  late Box<Note> notesBox;
 
   //Hide Status
+  @override
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
       overlays: [],
     );
+    notesBox = Hive.box('notes');
+    debugPrint("Notes: ${notesBox.keys}");
+  }
+
+  // Close Hive Box
+  @override
+  void dispose() {
+    Hive.close();
+    super.dispose();
   }
 
   @override
@@ -51,7 +66,11 @@ class _HomePageState extends State<HomePage> {
         elevation: 0.0,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              setState(() async {
+                // await notesBox.clear();
+              });
+            },
             icon: const Icon(Icons.search_sharp),
           )
         ],
@@ -91,7 +110,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color.fromARGB(190, 12, 12, 12),
         onPressed: (() {
-          navigateToDetails('Add Note');
+          navigateToDetails('Add Note', red);
         }),
         child: const Center(
           child: Icon(
@@ -108,11 +127,13 @@ class _HomePageState extends State<HomePage> {
     return ListView.builder(
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      itemCount: 0,
+      itemCount: notesBox.length,
       itemBuilder: (BuildContext context, int index) {
+        var currentBox = notesBox;
+        var noteData = notesBox.getAt(index)!;
         return InkWell(
           onTap: () {
-            navigateToDetails('Edit Note');
+            navigateToDetails('Edit Note', index);
           },
           child: Padding(
             padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
@@ -132,7 +153,7 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "noteData.title",
+                          noteData.title,
                           style: TextStyle(
                             // decoration: TextDecoration.underline,
                             // color: Colors.amberAccent,
@@ -150,12 +171,21 @@ class _HomePageState extends State<HomePage> {
                               constraints: BoxConstraints(),
                               // splashRadius: 15,
                               onPressed: () {
-                                setState(() {});
+                                setState(() {
+                                  var _cP = checkNote(noteData.isCompleted);
+                                  notesBox.putAt(
+                                      noteData.key,
+                                      Note(
+                                          title: noteData.title,
+                                          description: noteData.description,
+                                          date: noteData.date,
+                                          isCompleted: _cP));
+                                });
                                 debugPrint("List Tile is Checked!");
                               },
                               icon: Icon(
                                 Icons.check_circle_outline,
-                                color: getStateColor(1),
+                                color: getStateColor(noteData.isCompleted),
                               ),
                             ),
                             IconButton(
@@ -163,7 +193,7 @@ class _HomePageState extends State<HomePage> {
                               constraints: BoxConstraints(),
                               // splashRadius: 15,
                               onPressed: () {
-                                deleteNote(context);
+                                deleteNote(context, index);
                               },
                               icon: Icon(
                                 Icons.delete_outlined,
@@ -180,7 +210,7 @@ class _HomePageState extends State<HomePage> {
                         bottom: 5,
                       ),
                       child: Text(
-                        "{noteData.description}",
+                        noteData.description ?? "\n",
                         style: TextStyle(
                           color: Colors.white70,
                           fontFamily: 'Edu VIC',
@@ -192,9 +222,9 @@ class _HomePageState extends State<HomePage> {
                     //Date
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
-                      children: const [
+                      children: [
                         Text(
-                          "2022-08-28",
+                          noteData.date.toString().substring(0, 16),
                           style: TextStyle(color: Colors.white70),
                         ),
                       ],
@@ -209,7 +239,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<dynamic> deleteNote(BuildContext context) {
+  Future<dynamic> deleteNote(BuildContext context, int index) {
     return showDialog(
         context: context,
         builder: (context) {
@@ -227,7 +257,9 @@ class _HomePageState extends State<HomePage> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  setState(() {});
+                  setState(() {
+                    notesBox.deleteAt(index);
+                  });
                 },
                 child: Text("Yes!"),
               ),
@@ -236,10 +268,14 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
-  void navigateToDetails(String title) async {
+  void navigateToDetails(String title, int? index) async {
     bool res =
         await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return NoteDetails(appBarTitle: title);
+      return NoteDetails(
+        appBarTitle: title,
+        noteBox: notesBox,
+        index: index,
+      );
     }));
     if (res == true) {
       debugPrint("Hey It's restated!");
@@ -247,16 +283,24 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Color getStateColor(int state) {
-    switch (state) {
-      case 1:
+  Color getStateColor(bool _cPn) {
+    switch (_cPn) {
+      case false:
         return Colors.white70;
         break;
-      case 2:
+      case true:
         return Colors.green;
         break;
       default:
         return Colors.white70;
+    }
+  }
+
+  bool checkNote(bool isCompleted) {
+    if (isCompleted == false) {
+      return true;
+    } else {
+      return false;
     }
   }
 }
