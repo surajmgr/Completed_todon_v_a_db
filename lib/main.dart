@@ -11,9 +11,11 @@ Future main() async {
 
   // Registing Adapter for the custom objects
   Hive.registerAdapter(NoteAdapter());
+  Hive.registerAdapter(UserInfoAdapter());
 
   // Open Box
   await Hive.openBox<Note>('notes');
+  await Hive.openBox<UserInfo>('user');
 
   // Run the widgets
   runApp(const MyApp());

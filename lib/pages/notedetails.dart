@@ -1,7 +1,9 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:todon_v_a_db/constants/const.dart';
 import 'package:todon_v_a_db/database/note.dart';
+import 'package:build_daemon/constants.dart';
 
 class NoteDetails extends StatefulWidget {
   final String appBarTitle;
@@ -54,7 +56,13 @@ class NoteDetailsState extends State<NoteDetails> {
         automaticallyImplyLeading: false,
         leading: Builder(
           builder: (context) => IconButton(
-            onPressed: () => moveToLastScreen(),
+            onPressed: () {
+              if (!isChanged) {
+                moveToLastScreen();
+              } else {
+                changeWarnning();
+              }
+            },
             icon: const Icon(
               Icons.arrow_back_rounded,
               size: 25,
@@ -74,7 +82,7 @@ class NoteDetailsState extends State<NoteDetails> {
         actions: [
           IconButton(
             onPressed: () {
-              iconPress("Save");
+              _saveDB();
               debugPrint("Saved!!!");
             },
             icon: const Icon(Icons.save_outlined),
@@ -83,7 +91,7 @@ class NoteDetailsState extends State<NoteDetails> {
             padding: const EdgeInsets.only(right: 10),
             child: IconButton(
               onPressed: () {
-                deleteNote(context);
+                deleteNote(context, noteData.key);
               },
               icon: const Icon(Icons.delete_outlined),
             ),
@@ -112,6 +120,7 @@ class NoteDetailsState extends State<NoteDetails> {
                   }).toList(),
                   value: updateString(_cP),
                   onChanged: (valueSelectedByUser) {
+                    isChanged = true;
                     setState(() {
                       if (valueSelectedByUser == 'In-Progress') {
                         _cP = false;
@@ -134,6 +143,7 @@ class NoteDetailsState extends State<NoteDetails> {
                 maxLines: 1,
                 controller: titleController,
                 onChanged: (value) {
+                  isChanged = true;
                   debugPrint("Something changed in the Title Text Field!");
                 },
                 style: TextStyle(color: Colors.white),
@@ -165,6 +175,7 @@ class NoteDetailsState extends State<NoteDetails> {
                 maxLines: 15,
                 controller: descriptionController,
                 onChanged: (value) {
+                  isChanged = true;
                   debugPrint(
                       "Something changed in the Description Text Field!");
                 },
@@ -204,12 +215,7 @@ class NoteDetailsState extends State<NoteDetails> {
                     ),
                     onPressed: () {
                       // _showAlertDialog('Status', 'No Note was deleted!');
-                      iconPress("Save");
-                      if (noteData == null) {
-                        _addInfo();
-                      } else {
-                        _updateInfo();
-                      }
+                      _saveDB();
                     },
                   ),
                   SizedBox(
@@ -222,7 +228,7 @@ class NoteDetailsState extends State<NoteDetails> {
                       textScaleFactor: 1.5,
                     ),
                     onPressed: () {
-                      deleteNote(context);
+                      deleteNote(context, widget.index!);
                     },
                   ),
                 ],
@@ -232,6 +238,15 @@ class NoteDetailsState extends State<NoteDetails> {
         ),
       ),
     );
+  }
+
+  void _saveDB() {
+    if (noteData == null) {
+      _addInfo();
+    } else {
+      _updateInfo();
+    }
+    iconPress("Save");
   }
 
   void moveToLastScreen() {
@@ -249,7 +264,6 @@ class NoteDetailsState extends State<NoteDetails> {
 
   void iconPress(String title) {
     setState(() {
-      moveToLastScreen();
       _showAlertDialog('Status', 'Note ${title}d Successfully!');
       debugPrint("$title button is clicked!");
     });
@@ -263,7 +277,7 @@ class NoteDetailsState extends State<NoteDetails> {
     }
   }
 
-  Future<dynamic> deleteNote(BuildContext context) {
+  Future<dynamic> deleteNote(BuildContext context, int index) {
     return showDialog(
         context: context,
         builder: (context) {
@@ -281,7 +295,9 @@ class NoteDetailsState extends State<NoteDetails> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  iconPress("Delete");
+                  widget.noteBox.deleteAt(index);
+                  debugPrint(index.toString());
+                  moveToLastScreen();
                 },
                 child: Text("Yes!"),
               ),
@@ -301,6 +317,7 @@ class NoteDetailsState extends State<NoteDetails> {
     widget.noteBox.add(newNote);
     debugPrint("Info Added: \n $newNote");
     debugPrint("Key: ${newNote.key}");
+    isChanged = false;
     moveToLastScreen();
   }
 
@@ -315,6 +332,32 @@ class NoteDetailsState extends State<NoteDetails> {
     widget.noteBox.putAt(widget.index!, updateNote);
     debugPrint("Info Added: \n $updateNote");
     debugPrint("Key: ${updateNote.key}");
+    isChanged = false;
     moveToLastScreen();
+  }
+
+  void changeWarnning() {
+    AlertDialog alertDialog = AlertDialog(
+      backgroundColor: Colors.black87,
+      title: Text("Warning!"),
+      content: Text("You have unsaved note. Do you want to leave?"),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            isChanged = false;
+            moveToLastScreen();
+          },
+          child: Text("Yes!"),
+        ),
+      ],
+    );
+    showDialog(context: context, builder: (_) => alertDialog);
   }
 }

@@ -20,6 +20,9 @@ class _HomePageState extends State<HomePage> {
 
   late Box<Note> notesBox;
 
+  int completedNoteLength = 0;
+  int incompletedNoteLength = 0;
+
   //Hide Status
   @override
   void initState() {
@@ -41,6 +44,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    completedNoteLength =
+        notesBox.values.where((note) => note.isCompleted).length;
+    incompletedNoteLength =
+        notesBox.values.where((note) => !note.isCompleted).length;
+
+    // .forEach(((element) => completedNoteLength++));
     return Scaffold(
       // extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -67,8 +76,8 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: () {
-              setState(() async {
-                // await notesBox.clear();
+              setState(() {
+                notesBox.clear();
               });
             },
             icon: const Icon(Icons.search_sharp),
@@ -83,7 +92,11 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Heading
-              HeadingHP(name: 'Suraj'),
+              HeadingHP(
+                name: 'Suraj',
+                iLength: incompletedNoteLength,
+                cLength: completedNoteLength,
+              ),
               // List Builder
               noteListUI(),
               // End
@@ -129,7 +142,6 @@ class _HomePageState extends State<HomePage> {
       shrinkWrap: true,
       itemCount: notesBox.length,
       itemBuilder: (BuildContext context, int index) {
-        var currentBox = notesBox;
         var noteData = notesBox.getAt(index)!;
         return InkWell(
           onTap: () {
@@ -174,12 +186,13 @@ class _HomePageState extends State<HomePage> {
                                 setState(() {
                                   var _cP = checkNote(noteData.isCompleted);
                                   notesBox.putAt(
-                                      noteData.key,
+                                      index,
                                       Note(
-                                          title: noteData.title,
-                                          description: noteData.description,
-                                          date: noteData.date,
-                                          isCompleted: _cP));
+                                        title: noteData.title,
+                                        description: noteData.description,
+                                        date: noteData.date,
+                                        isCompleted: _cP,
+                                      ));
                                 });
                                 debugPrint("List Tile is Checked!");
                               },
@@ -306,12 +319,16 @@ class _HomePageState extends State<HomePage> {
 }
 
 class HeadingHP extends StatelessWidget {
-  const HeadingHP({
-    Key? key,
-    required this.name,
-  }) : super(key: key);
+  const HeadingHP(
+      {Key? key,
+      required this.name,
+      required this.cLength,
+      required this.iLength})
+      : super(key: key);
 
   final String? name;
+  final int? cLength;
+  final int? iLength;
 
   @override
   Widget build(BuildContext context) {
@@ -348,7 +365,7 @@ class HeadingHP extends StatelessWidget {
             ),
           ),
           Text(
-            "This is your todo-list.\nYou still have 5 tasks in the list.",
+            "This is your todo-list.\nYou have ${iLength ?? 0} tasks in-progress, and completed ${cLength ?? 0} tasks out of ${(iLength ?? 0) + (cLength ?? 0)} tasks.",
             style: TextStyle(
               color: Colors.white70,
               fontFamily: 'Edu VIC',
