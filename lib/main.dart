@@ -17,8 +17,25 @@ Future main() async {
   Hive.registerAdapter(UserInfoAdapter());
 
   // Open Box
-  await Hive.openBox<Note>('notes');
-  await Hive.openBox<UserInfo>('user');
+  int _reverseOrder(k1, k2) {
+    if (k1 is int) {
+      if (k2 is int) {
+        if (k1 > k2) {
+          return -1;
+        } else if (k1 < k2) {
+          return 1;
+        } else {
+          return 0;
+        }
+      } else {
+        return -1;
+      }
+    }
+    return 0;
+  }
+
+  await Hive.openBox<Note>('notes', keyComparator: _reverseOrder);
+  await Hive.openBox('userN');
 
   // Shared Prefs
   Constants.prefs = await SharedPreferences.getInstance();
@@ -32,7 +49,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Constants.prefs!.setBool("loggedIn", false);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "New TODO App Practice",
@@ -45,6 +61,20 @@ class MyApp extends StatelessWidget {
             ),
         scaffoldBackgroundColor: const Color(0xFF131617),
         primarySwatch: Colors.deepPurple,
+        primaryTextTheme: const TextTheme(
+          bodyText1: TextStyle(
+            color: Colors.white,
+            fontFamily: 'Edu VIC',
+            letterSpacing: 1,
+            fontSize: 18,
+          ),
+          bodyText2: TextStyle(
+            color: Colors.black,
+            fontFamily: 'Edu VIC',
+            letterSpacing: 1,
+            fontSize: 18,
+          ),
+        ),
       ),
     );
   }

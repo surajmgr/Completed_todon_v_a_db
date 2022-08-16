@@ -19,6 +19,7 @@ class _HomePageState extends State<HomePage> {
   int? red;
 
   late Box<Note> notesBox;
+  late Box userBox;
 
   int completedNoteLength = 0;
   int incompletedNoteLength = 0;
@@ -32,6 +33,7 @@ class _HomePageState extends State<HomePage> {
       overlays: [],
     );
     notesBox = Hive.box('notes');
+    userBox = Hive.box('userN');
     debugPrint("Notes: ${notesBox.keys}");
   }
 
@@ -57,6 +59,7 @@ class _HomePageState extends State<HomePage> {
         leading: Builder(
           builder: (context) => IconButton(
             onPressed: () => Scaffold.of(context).openDrawer(),
+            // onPressed: () => navigateToDrawer(),
             icon: const Icon(
               Icons.auto_awesome,
               size: 25,
@@ -93,7 +96,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               // Heading
               HeadingHP(
-                name: 'Suraj',
+                name: userBox.get('fName'),
                 iLength: incompletedNoteLength,
                 cLength: completedNoteLength,
               ),
@@ -120,6 +123,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       drawer: const MyDrawer(),
+      onDrawerChanged: (isOpened) {
+        if (!isOpened) {
+          setState(() {});
+        }
+      },
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color.fromARGB(190, 12, 12, 12),
         onPressed: (() {
@@ -137,12 +145,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget noteListUI() {
+    // notesBox.values.toList().sort((a, b) => b.date.compareTo(a.date));
     return ListView.builder(
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: notesBox.length,
       itemBuilder: (BuildContext context, int index) {
         var noteData = notesBox.getAt(index)!;
+        debugPrint("${noteData.key}: $index");
         return InkWell(
           onTap: () {
             navigateToDetails('Edit Note', index);
@@ -296,6 +306,17 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void navigateToDrawer() async {
+    bool res =
+        await Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return MyDrawer();
+    }));
+    if (res == true) {
+      debugPrint("Hey It's restated!");
+      setState(() {});
+    }
+  }
+
   Color getStateColor(bool _cPn) {
     switch (_cPn) {
       case false:
@@ -319,12 +340,12 @@ class _HomePageState extends State<HomePage> {
 }
 
 class HeadingHP extends StatelessWidget {
-  const HeadingHP(
-      {Key? key,
-      required this.name,
-      required this.cLength,
-      required this.iLength})
-      : super(key: key);
+  const HeadingHP({
+    Key? key,
+    required this.name,
+    required this.cLength,
+    required this.iLength,
+  }) : super(key: key);
 
   final String? name;
   final int? cLength;

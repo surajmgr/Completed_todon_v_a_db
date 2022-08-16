@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todon_v_a_db/constants/const.dart';
+import 'package:todon_v_a_db/database/note.dart';
 import 'package:todon_v_a_db/pages/homepg.dart';
 
 class Login extends StatefulWidget {
-  // const Login({super.key});
+  const Login({super.key});
 
   @override
   State<Login> createState() => _LoginState();
@@ -14,8 +16,33 @@ class _LoginState extends State<Login> {
   final lastNameController = TextEditingController();
   final emailController = TextEditingController();
   // final avatarController;
+
+  late Box userBox;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (Hive.isBoxOpen('userN')) {
+      debugPrint("Opened!");
+    } else {
+      debugPrint("Closed!");
+    }
+    // openBox();
+    userBox = Hive.box('userN');
+    debugPrint("Users: ${userBox.keys}");
+    // debugPrint(userBox.getAt(0)!.firstName.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
+    debugPrint(userBox.keys.toString());
+    if (Hive.isBoxOpen('userN')) {
+      debugPrint("Opened!");
+      debugPrint(userBox.get('fName').toString());
+    } else {
+      debugPrint("Closed!");
+    }
     return Scaffold(
       body: Center(
         child: Column(
@@ -46,16 +73,17 @@ class _LoginState extends State<Login> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
-                          fontFamily: 'Edu VIC',
+                          // fontFamily: 'Edu VIC',
                           fontSize: 30,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w300,
+                          letterSpacing: 4,
                           // decoration: TextDecoratio
                         ),
                       ),
                     ),
                   ),
                   // Profile Picture
-                  Container(
+                  SizedBox(
                     // height: 100,
                     width: 330,
                     child: Padding(
@@ -80,6 +108,8 @@ class _LoginState extends State<Login> {
                               "Profile Picture",
                               style: TextStyle(
                                 color: Colors.black,
+                                fontFamily: 'Edu VIC',
+                                letterSpacing: 0.5,
                               ),
                             ),
                           ),
@@ -88,7 +118,7 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                   // First Name
-                  Container(
+                  SizedBox(
                     width: 320,
                     child: Padding(
                       padding: const EdgeInsets.only(
@@ -101,14 +131,15 @@ class _LoginState extends State<Login> {
                           debugPrint(
                               "Something changed in the Title Text Field!");
                         },
-                        style: TextStyle(color: Colors.black),
+                        style: Theme.of(context).primaryTextTheme.bodyText2,
                         decoration: InputDecoration(
                           counterText: "",
                           labelText: "First name",
-                          labelStyle: TextStyle(color: Colors.black),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: const BorderSide(
-                                width: 1.2, color: Colors.black),
+                          labelStyle:
+                              Theme.of(context).primaryTextTheme.bodyText2,
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide:
+                                BorderSide(width: 1.2, color: Colors.black),
                             // borderRadius: BorderRadius.circular(5.0),
                           ),
                           focusedBorder: OutlineInputBorder(
@@ -116,14 +147,14 @@ class _LoginState extends State<Login> {
                                 width: 1.2, color: Colors.purple),
                             borderRadius: BorderRadius.circular(5.0),
                           ),
-                          contentPadding: EdgeInsets.only(
+                          contentPadding: const EdgeInsets.only(
                               left: 5, bottom: 0, top: 5, right: 5),
                         ),
                       ),
                     ),
                   ),
                   // Last Name
-                  Container(
+                  SizedBox(
                     width: 320,
                     child: Padding(
                       padding: const EdgeInsets.only(
@@ -136,11 +167,12 @@ class _LoginState extends State<Login> {
                           debugPrint(
                               "Something changed in the Title Text Field!");
                         },
-                        style: TextStyle(color: Colors.black),
+                        style: Theme.of(context).primaryTextTheme.bodyText2,
                         decoration: InputDecoration(
                           counterText: "",
                           labelText: "Last name",
-                          labelStyle: const TextStyle(color: Colors.black),
+                          labelStyle:
+                              Theme.of(context).primaryTextTheme.bodyText2,
                           enabledBorder: const UnderlineInputBorder(
                             borderSide:
                                 BorderSide(width: 1.2, color: Colors.black),
@@ -151,14 +183,14 @@ class _LoginState extends State<Login> {
                                 width: 1.2, color: Colors.purple),
                             borderRadius: BorderRadius.circular(5.0),
                           ),
-                          contentPadding: EdgeInsets.only(
+                          contentPadding: const EdgeInsets.only(
                               left: 5, bottom: 0, top: 5, right: 5),
                         ),
                       ),
                     ),
                   ),
                   // Email
-                  Container(
+                  SizedBox(
                     width: 320,
                     child: Padding(
                       padding: const EdgeInsets.only(
@@ -171,11 +203,12 @@ class _LoginState extends State<Login> {
                           debugPrint(
                               "Something changed in the Title Text Field!");
                         },
-                        style: TextStyle(color: Colors.black),
+                        style: Theme.of(context).primaryTextTheme.bodyText2,
                         decoration: InputDecoration(
                           counterText: "",
                           labelText: "Email address",
-                          labelStyle: const TextStyle(color: Colors.black),
+                          labelStyle:
+                              Theme.of(context).primaryTextTheme.bodyText2,
                           enabledBorder: const UnderlineInputBorder(
                             borderSide:
                                 BorderSide(width: 1.2, color: Colors.black),
@@ -186,14 +219,14 @@ class _LoginState extends State<Login> {
                                 width: 1.2, color: Colors.purple),
                             borderRadius: BorderRadius.circular(5.0),
                           ),
-                          contentPadding: EdgeInsets.only(
+                          contentPadding: const EdgeInsets.only(
                               left: 5, bottom: 0, top: 5, right: 5),
                         ),
                       ),
                     ),
                   ),
                   // Button
-                  Container(
+                  SizedBox(
                     width: 330,
                     child: Padding(
                       padding: const EdgeInsets.only(
@@ -208,9 +241,25 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          if (Hive.isBoxOpen('userN')) {
+                            debugPrint("Opened!");
+                          } else {
+                            debugPrint("Closed!");
+                          }
+                          _addInfo();
+                          // navigateToHP();
+                          setState(() {
+                            navigateToHP();
+                          });
+                        },
                         child: const Text(
                           "Login",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w300,
+                            letterSpacing: 2,
+                          ),
                           // textScaleFactor: 1.5,
                         ),
                       ),
@@ -225,14 +274,21 @@ class _LoginState extends State<Login> {
     );
   }
 
-  void navigateToDetails() async {
-    bool res =
-        await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return HomePage();
-    }));
-    if (res == true) {
-      debugPrint("Hey It's restated!");
-      setState(() {});
-    }
+  void navigateToHP() async {
+    Constants.prefs!.setBool("loggedIn", true);
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (BuildContext context) => new HomePage()));
+  }
+
+  _addInfo() {
+    userBox.put('fName',
+        firstNameController.text != "" ? firstNameController.text : "Coders");
+    userBox.put('lName',
+        lastNameController.text != "" ? lastNameController.text : "Name");
+    userBox.put(
+        'email',
+        emailController.text != ""
+            ? firstNameController.text
+            : "emailaddress123@email.com");
   }
 }

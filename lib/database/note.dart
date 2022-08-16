@@ -27,9 +27,11 @@ class UserInfo extends HiveObject {
   @HiveField(0)
   late Uint8List? avatar;
   @HiveField(1)
-  late String name;
+  late String firstName;
   @HiveField(2)
+  late String? lastName;
+  @HiveField(3)
   late String? email;
 
-  UserInfo({this.avatar, required this.name, this.email});
+  UserInfo({this.avatar, required this.firstName, this.lastName, this.email});
 }

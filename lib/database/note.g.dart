@@ -61,20 +61,23 @@ class UserInfoAdapter extends TypeAdapter<UserInfo> {
     };
     return UserInfo(
       avatar: fields[0] as Uint8List?,
-      name: fields[1] as String,
-      email: fields[2] as String?,
+      firstName: fields[1] as String,
+      lastName: fields[2] as String?,
+      email: fields[3] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserInfo obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.avatar)
       ..writeByte(1)
-      ..write(obj.name)
+      ..write(obj.firstName)
       ..writeByte(2)
+      ..write(obj.lastName)
+      ..writeByte(3)
       ..write(obj.email);
   }
 
