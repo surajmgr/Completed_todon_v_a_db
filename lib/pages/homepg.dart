@@ -79,11 +79,9 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: () {
-              setState(() {
-                notesBox.clear();
-              });
+              setState(() {});
             },
-            icon: const Icon(Icons.search_sharp),
+            icon: const Icon(Icons.refresh),
           )
         ],
       ),
@@ -175,13 +173,15 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          noteData.title,
+                          noteData.title + " ",
                           style: TextStyle(
                             // decoration: TextDecoration.underline,
                             // color: Colors.amberAccent,
-                            fontFamily: 'EDU VIC',
+                            fontFamily: 'Edu VIC',
                             fontSize: 20,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w300,
+                            wordSpacing: 2,
+                            letterSpacing: 1,
                           ),
                         ),
                         // Check & Delete
@@ -379,7 +379,7 @@ class HeadingHP extends StatelessWidget {
             "Hello, ${name ?? 'Coders'}!",
             style: TextStyle(
               color: Colors.white,
-              fontFamily: 'Alex Brush',
+              fontFamily: 'Edu VAC',
               fontSize: 50,
               //backgroundColor: Colors.amberAccent,
               fontWeight: FontWeight.w500,

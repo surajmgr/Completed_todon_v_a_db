@@ -89,6 +89,9 @@ flutter:
       - family: Edu VIC
         fonts:
           - asset: fonts/EduVIC.ttf
+      - family: Edu VAC
+        fonts:
+          - asset: fonts/eduV.ttf
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf

@@ -170,9 +170,7 @@ class NoteDetailsState extends State<NoteDetails> {
               padding: EdgeInsets.only(top: 5, bottom: 15, left: 20, right: 20),
               child: TextFormField(
                 textAlignVertical: TextAlignVertical.top,
-                maxLength: 255,
                 minLines: 1,
-                maxLines: 15,
                 controller: descriptionController,
                 onChanged: (value) {
                   isChanged = true;

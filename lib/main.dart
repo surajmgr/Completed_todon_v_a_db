@@ -48,6 +48,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    late Box<Note> noteBox = Hive.box('notes');
+    if (noteBox.isEmpty) {
+      noteBox.add(Note(
+        title: "Guide!",
+        description:
+            "In-Progress Task has grey check button on the top right section. ☑\nOn tap: 👉 ✅\nCompleted Task has green check button on the top right section. ✅\nOn tap: 👉 ☑\nThe red bin button on the top right section handles the deletion of the note. 🗑\nOn tap: Delete the note ❌\nTop left button opens the menu. #️⃣\nContains: Personal Details 🐯, Notes' features ✒, and Log out 📤 ❕",
+        date: DateTime.now(),
+        isCompleted: false,
+      ));
+    }
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "New TODO App Practice",
