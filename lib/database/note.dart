@@ -21,17 +21,3 @@ class Note extends HiveObject {
     required this.isCompleted,
   });
 }
-
-@HiveType(typeId: 1)
-class UserInfo extends HiveObject {
-  @HiveField(0)
-  late Uint8List? avatar;
-  @HiveField(1)
-  late String firstName;
-  @HiveField(2)
-  late String? lastName;
-  @HiveField(3)
-  late String? email;
-
-  UserInfo({this.avatar, required this.firstName, this.lastName, this.email});
-}

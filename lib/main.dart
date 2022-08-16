@@ -14,7 +14,6 @@ Future main() async {
 
   // Registing Adapter for the custom objects
   Hive.registerAdapter(NoteAdapter());
-  Hive.registerAdapter(UserInfoAdapter());
 
   // Open Box
   int _reverseOrder(k1, k2) {
