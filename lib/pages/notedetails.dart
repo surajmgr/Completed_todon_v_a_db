@@ -171,6 +171,7 @@ class NoteDetailsState extends State<NoteDetails> {
               child: TextFormField(
                 textAlignVertical: TextAlignVertical.top,
                 minLines: 1,
+                maxLines: 25,
                 controller: descriptionController,
                 onChanged: (value) {
                   isChanged = true;
